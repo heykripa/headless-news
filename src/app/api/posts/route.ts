@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     // Get query parameters from the request
     const { searchParams } = new URL(request.url);
-    const perPage = searchParams.get("per_page") || "6";
+    const perPage = searchParams.get("per_page") || "8";
     const forceRefresh = searchParams.get("refresh") === "true";
 
     // Create cache key based on parameters

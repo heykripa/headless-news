@@ -20,7 +20,7 @@ export function HeroSection() {
   useEffect(() => {
     async function loadPosts() {
       try {
-        const recentPosts = await fetchRecentPosts(6);
+        const recentPosts = await fetchRecentPosts(8);
         setPosts(recentPosts);
       } catch (error) {
         console.error("Failed to load posts:", error);

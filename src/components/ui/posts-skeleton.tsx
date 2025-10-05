@@ -6,9 +6,9 @@ interface PostsSkeletonProps {
   count?: number;
 }
 
-export function PostsSkeleton({ count = 6 }: PostsSkeletonProps) {
+export function PostsSkeleton({ count = 8 }: PostsSkeletonProps) {
   return (
-    <Card className="border-0 shadow-none">
+    <Card className="shadow-none border">
       <CardContent className="p-0">
         <div className="space-y-0">
           {Array.from({ length: count }).map((_, index) => (
