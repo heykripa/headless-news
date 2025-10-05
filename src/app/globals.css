@@ -83,7 +83,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-noto-sans-kannada), var(--font-geist-sans), system-ui, sans-serif;
+    font-family:
+      var(--font-noto-sans-kannada), var(--font-geist-sans), system-ui,
+      sans-serif;
   }
 }
 
@@ -91,7 +93,7 @@
   .font-kannada {
     font-family: var(--font-noto-sans-kannada), system-ui, sans-serif;
   }
-  
+
   .text-kannada {
     font-family: var(--font-noto-sans-kannada), system-ui, sans-serif;
     line-height: 1.6;

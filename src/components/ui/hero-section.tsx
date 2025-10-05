@@ -1,6 +1,7 @@
 "use client";
 
 import { PostsList } from "./posts-list";
+import { PostsSkeleton } from "./posts-skeleton";
 import { fetchRecentPosts } from "@/lib/api/wordpress";
 import { useEffect, useState } from "react";
 
@@ -22,7 +23,7 @@ export function HeroSection() {
         const recentPosts = await fetchRecentPosts(6);
         setPosts(recentPosts);
       } catch (error) {
-        console.error('Failed to load posts:', error);
+        console.error("Failed to load posts:", error);
       } finally {
         setLoading(false);
       }
@@ -36,22 +37,26 @@ export function HeroSection() {
       <div className="fluid-content">
         <h1 className="text-3xl font-bold mb-4">Latest News</h1>
         <p className="text-lg mb-6">
-          Welcome to NewsKarnataka, your source for the latest news and updates from Karnataka and beyond.
+          Welcome to NewsKarnataka, your source for the latest news and updates
+          from Karnataka and beyond.
         </p>
         <div className="bg-gray-100 p-6 rounded-lg">
           <h2 className="text-2xl font-semibold mb-3">Featured Story</h2>
           <p className="mb-4">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in
+            dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula.
           </p>
           <p>
-            Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor.
+            Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in
+            nulla enim. Phasellus molestie magna non est bibendum non venenatis
+            nisl tempor.
           </p>
         </div>
       </div>
       <div className="sidebar">
         <h2 className="text-xl font-semibold mb-4">Recent Updates</h2>
         {loading ? (
-          <div className="text-center py-4">Loading posts...</div>
+          <PostsSkeleton count={6} />
         ) : posts.length > 0 ? (
           <PostsList posts={posts} />
         ) : (
