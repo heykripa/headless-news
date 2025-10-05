@@ -11,6 +11,7 @@ interface Post {
   date: string;
   excerpt?: string;
   link?: string;
+  slug?: string;
 }
 
 export function HeroSection() {

@@ -39,11 +39,17 @@ export async function GET(request: NextRequest) {
     // Get query parameters from the request
     const { searchParams } = new URL(request.url);
     const perPage = searchParams.get("per_page") || "8";
+    const categoryName = searchParams.get("category_name");
     const forceRefresh = searchParams.get("refresh") === "true";
 
     // Create cache key based on parameters
-    const cacheKey = `wp-posts-${perPage}`;
-    const url = `${WP_API_URL}/posts?per_page=${perPage}`;
+    const cacheKey = `wp-posts-${perPage}${categoryName ? `-${categoryName}` : ''}`;
+    
+    // Build URL with optional category filter
+    let url = `${WP_API_URL}/posts?per_page=${perPage}`;
+    if (categoryName) {
+      url += `&category_name=${encodeURIComponent(categoryName)}`;
+    }
 
     const headers: HeadersInit = {
       "Content-Type": "application/json",

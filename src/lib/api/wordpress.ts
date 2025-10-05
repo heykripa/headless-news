@@ -21,11 +21,15 @@ interface Post {
   date: string;
   excerpt?: string;
   link?: string;
+  slug?: string;
 }
 
 // Use local API route to avoid CORS issues
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+// WordPress site URL for constructing post links
+const WP_SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -40,8 +44,11 @@ function formatDate(dateString: string): string {
   return date.toLocaleDateString("en-US", options);
 }
 
-async function fetchPostsFromAPI(limit: number): Promise<Post[]> {
-  const url = `${API_BASE_URL}/api/posts?per_page=${limit}`;
+async function fetchPostsFromAPI(limit: number, categoryName?: string): Promise<Post[]> {
+  let url = `${API_BASE_URL}/api/posts?per_page=${limit}`;
+  if (categoryName) {
+    url += `&category_name=${encodeURIComponent(categoryName)}`;
+  }
 
   const response = await fetch(url, {
     method: "GET",
@@ -62,7 +69,8 @@ async function fetchPostsFromAPI(limit: number): Promise<Post[]> {
     title: decodeHtmlEntities(post.title),
     date: formatDate(post.published),
     excerpt: processWordPressContent(post.excerpt),
-    link: `https://api-kn.newskarnataka.com/${post.slug}`, // Construct link from slug
+    link: `${WP_SITE_URL}/${post.slug.startsWith('/') ? post.slug.slice(1) : post.slug}`, // Construct link from slug
+    slug: post.slug,
   }));
 }
 
@@ -79,6 +87,25 @@ export async function fetchRecentPosts(
     });
   } catch (error) {
     console.error("Error fetching posts from WordPress:", error);
+    // Return empty array if API fails - no dummy data
+    return [];
+  }
+}
+
+export async function fetchPostsByCategory(
+  categoryName: string,
+  limit: number = 6,
+  options: { forceRefresh?: boolean } = {},
+): Promise<Post[]> {
+  try {
+    const cacheKey = `client-posts-${limit}-${categoryName}`;
+
+    return await withCache(cacheKey, () => fetchPostsFromAPI(limit, categoryName), {
+      ttl: 3 * 60 * 1000, // 3 minutes client-side cache (shorter than server)
+      forceRefresh: options.forceRefresh,
+    });
+  } catch (error) {
+    console.error(`Error fetching posts for category ${categoryName}:`, error);
     // Return empty array if API fails - no dummy data
     return [];
   }
