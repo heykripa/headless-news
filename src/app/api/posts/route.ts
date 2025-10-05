@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { withCache } from "@/lib/utils/cache";
 
 const WP_API_URL = process.env.WP_API_URL;
 const WP_USERNAME = process.env.WP_USERNAME;
@@ -10,6 +11,20 @@ function createAuthHeader(): string {
   }
   const credentials = btoa(`${WP_USERNAME}:${WP_APP_PASSWORD}`);
   return `Basic ${credentials}`;
+}
+
+async function fetchWordPressPosts(url: string, headers: HeadersInit) {
+  const response = await fetch(url, {
+    method: "GET",
+    headers,
+    cache: "no-store", // Disable Next.js caching, we handle our own
+  });
+
+  if (!response.ok) {
+    throw new Error(`WordPress API error: ${response.status}`);
+  }
+
+  return response.json();
 }
 
 export async function GET(request: NextRequest) {
@@ -24,7 +39,10 @@ export async function GET(request: NextRequest) {
     // Get query parameters from the request
     const { searchParams } = new URL(request.url);
     const perPage = searchParams.get("per_page") || "6";
+    const forceRefresh = searchParams.get("refresh") === "true";
 
+    // Create cache key based on parameters
+    const cacheKey = `wp-posts-${perPage}`;
     const url = `${WP_API_URL}/posts?per_page=${perPage}`;
 
     const headers: HeadersInit = {
@@ -37,20 +55,15 @@ export async function GET(request: NextRequest) {
       headers["Authorization"] = authHeader;
     }
 
-    const response = await fetch(url, {
-      method: "GET",
-      headers,
-      cache: "no-store", // Ensure fresh data
-    });
-
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: `WordPress API error: ${response.status}` },
-        { status: response.status },
-      );
-    }
-
-    const posts = await response.json();
+    // Use cache wrapper with 5-minute TTL
+    const posts = await withCache(
+      cacheKey,
+      () => fetchWordPressPosts(url, headers),
+      {
+        ttl: 5 * 60 * 1000, // 5 minutes
+        forceRefresh,
+      },
+    );
 
     // Return the posts with CORS headers
     return NextResponse.json(posts, {
@@ -58,6 +71,7 @@ export async function GET(request: NextRequest) {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET",
         "Access-Control-Allow-Headers": "Content-Type",
+        "Cache-Control": "public, max-age=300", // Browser cache for 5 minutes
       },
     });
   } catch (error) {

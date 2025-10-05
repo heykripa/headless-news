@@ -2,6 +2,7 @@ import {
   decodeHtmlEntities,
   processWordPressContent,
 } from "@/lib/utils/content";
+import { withCache } from "@/lib/utils/cache";
 
 interface WordPressPost {
   id: number;
@@ -39,34 +40,53 @@ function formatDate(dateString: string): string {
   return date.toLocaleDateString("en-US", options);
 }
 
-export async function fetchRecentPosts(limit: number = 6): Promise<Post[]> {
+async function fetchPostsFromAPI(limit: number): Promise<Post[]> {
+  const url = `${API_BASE_URL}/api/posts?per_page=${limit}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    // Let browser handle caching based on Cache-Control headers from API
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const posts: WordPressPost[] = await response.json();
+
+  return posts.map((post) => ({
+    id: post.id.toString(),
+    title: decodeHtmlEntities(post.title),
+    date: formatDate(post.published),
+    excerpt: processWordPressContent(post.excerpt),
+    link: `https://api-kn.newskarnataka.com/${post.slug}`, // Construct link from slug
+  }));
+}
+
+export async function fetchRecentPosts(
+  limit: number = 6,
+  options: { forceRefresh?: boolean } = {},
+): Promise<Post[]> {
   try {
-    const url = `${API_BASE_URL}/api/posts?per_page=${limit}`;
+    const cacheKey = `client-posts-${limit}`;
 
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store", // Ensure fresh data
+    return await withCache(cacheKey, () => fetchPostsFromAPI(limit), {
+      ttl: 3 * 60 * 1000, // 3 minutes client-side cache (shorter than server)
+      forceRefresh: options.forceRefresh,
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const posts: WordPressPost[] = await response.json();
-
-    return posts.map((post) => ({
-      id: post.id.toString(),
-      title: decodeHtmlEntities(post.title),
-      date: formatDate(post.published),
-      excerpt: processWordPressContent(post.excerpt),
-      link: `https://api-kn.newskarnataka.com/${post.slug}`, // Construct link from slug
-    }));
   } catch (error) {
     console.error("Error fetching posts from WordPress:", error);
     // Return empty array if API fails - no dummy data
     return [];
   }
+}
+
+/**
+ * Force refresh posts by clearing cache and fetching fresh data
+ */
+export async function refreshPosts(limit: number = 6): Promise<Post[]> {
+  return fetchRecentPosts(limit, { forceRefresh: true });
 }
