@@ -3,6 +3,7 @@
 import { PostsList } from "./posts-list";
 import { PostsSkeleton } from "./posts-skeleton";
 import { EmptyState } from "./empty-state";
+import { Badge } from "./badge";
 import { fetchPostsByCategory } from "@/lib/api/wordpress";
 import { useEffect, useState } from "react";
 
@@ -75,7 +76,11 @@ export function HomePostSections({ categories, title }: HomePostSectionsProps) {
   return (
     <div className="w-full">
       {title && (
-        <h2 className="text-2xl font-bold mb-6 text-center">{title}</h2>
+        <div className="flex justify-center mb-6">
+          <Badge variant="secondary" className="text-lg font-bold px-4 py-2">
+            {title}
+          </Badge>
+        </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {sections.map((section) => (
