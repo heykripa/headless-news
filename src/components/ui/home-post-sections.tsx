@@ -77,7 +77,7 @@ export function HomePostSections({ categories, title }: HomePostSectionsProps) {
     <div className="w-full">
       {title && (
         <div className="flex justify-center mb-6">
-          <Badge variant="secondary" className="text-lg font-bold px-4 py-2">
+          <Badge variant="secondary" className="text-xs font-semibold px-4 py-1 rounded-full border border-zinc-200">
             {title}
           </Badge>
         </div>

@@ -20,7 +20,7 @@ export function EmptyState({
     <Card className={`shadow-none border-dashed border-2 ${className}`}>
       <CardContent className="flex flex-col items-center justify-center py-8 px-4 text-center">
         <div className="mb-4 p-3 rounded-full bg-muted/50">
-          <IconComponent className="h-8 w-8 text-muted-foreground" />
+          <IconComponent className="h-6 w-6 text-muted-foreground" />
         </div>
         <h3 className="text-sm font-medium text-foreground mb-1">
           {title}

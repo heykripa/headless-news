@@ -23,7 +23,7 @@ export default function Home() {
       </main>
       
       {/* Regional News Section - Full Width */}
-      <div className="mt-12 py-16">
+      <div className="mt-12 py-16 bg-white">
         <div className="max-w-6xl mx-auto px-8">
           <HomePostSections 
             categories={REGIONAL_CATEGORIES} 
@@ -33,7 +33,7 @@ export default function Home() {
       </div>
       
       {/* Topical News Section - Full Width */}
-      <div className="py-16 bg-zinc-100">
+      <div className="py-16 bg-zinc-50">
         <div className="max-w-6xl mx-auto px-8">
           <HomePostSections 
             categories={TOPICAL_CATEGORIES} 
