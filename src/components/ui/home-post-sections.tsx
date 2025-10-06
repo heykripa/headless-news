@@ -79,7 +79,7 @@ export function HomePostSections({ categories, title }: HomePostSectionsProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {sections.map((section) => (
           <div key={section.categoryName} className="flex flex-col">
-            <h2 className="text-xl font-semibold mb-4 text-center">
+            <h2 className="text-base font-semibold mb-2 text-left text-accent-foreground">
               {section.displayName}
             </h2>
             {section.loading ? (
