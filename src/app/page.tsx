@@ -17,26 +17,30 @@ const TOPICAL_CATEGORIES = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen p-8">
-      <main className="max-w-6xl mx-auto">
+    <div className="min-h-screen">
+      <main className="max-w-6xl mx-auto p-8">
         <HeroSection />
-        
-        {/* Regional News Section */}
-        <div className="mt-12">
+      </main>
+      
+      {/* Regional News Section - Full Width */}
+      <div className="mt-12 py-8">
+        <div className="max-w-6xl mx-auto px-8">
           <HomePostSections 
             categories={REGIONAL_CATEGORIES} 
             title="Regional News"
           />
         </div>
-        
-        {/* Topical News Section */}
-        <div className="mt-16">
+      </div>
+      
+      {/* Topical News Section - Full Width */}
+      <div className="mt-16 bg-zinc-100 py-8">
+        <div className="max-w-6xl mx-auto px-8">
           <HomePostSections 
             categories={TOPICAL_CATEGORIES} 
             title="Topical News"
           />
         </div>
-      </main>
+      </div>
     </div>
   );
 }

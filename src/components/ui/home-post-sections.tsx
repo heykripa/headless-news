@@ -2,6 +2,7 @@
 
 import { PostsList } from "./posts-list";
 import { PostsSkeleton } from "./posts-skeleton";
+import { EmptyState } from "./empty-state";
 import { fetchPostsByCategory } from "@/lib/api/wordpress";
 import { useEffect, useState } from "react";
 
@@ -87,9 +88,11 @@ export function HomePostSections({ categories, title }: HomePostSectionsProps) {
             ) : section.posts.length > 0 ? (
               <PostsList posts={section.posts} />
             ) : (
-              <div className="text-center py-4 text-gray-500">
-                <p>No posts available for {section.displayName}.</p>
-              </div>
+              <EmptyState
+                title="No posts available"
+                description={`No content found for ${section.displayName} at the moment.`}
+                icon="newspaper"
+              />
             )}
           </div>
         ))}
